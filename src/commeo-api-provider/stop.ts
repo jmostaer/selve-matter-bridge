@@ -9,5 +9,5 @@ export const stop = (id: string) => {
 			cmd: "stop",
 		},
 	};
-	sendRequest(RequestMethod.POST, "/cmd", body);
+	return sendRequest(RequestMethod.POST, "/cmd", body);
 };

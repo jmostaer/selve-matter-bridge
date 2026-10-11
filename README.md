@@ -16,6 +16,7 @@ docker run -d \
     --network=host \
     --env SELVE_SERVER_IP="<your-selve-server-ip>" \
     --env SELVE_SERVER_PASSWORD="<your-selve-server-password>" \
+    --volume /path/to/selve-matter-bridge:/root/.matter \
     schneidermaster/selve-matter-bridge:latest
 ```
 
@@ -28,9 +29,24 @@ services:
     environment:
       - SELVE_SERVER_IP: <your-selve-server-ip>
       - SELVE_SERVER_PASSWORD: <your-selve-server-password>
+    volumes:
+      - /path/to/selve-matter-bridge:/root/.matter
     network_mode: host
     restart: unless-stopped
 ```
+
+### Configuration
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `SELVE_SERVER_IP` | yes | Address of the Selve Home Server 2, with or without scheme: `192.168.1.10` or `http://192.168.1.10`. Without a scheme, `http://` is used. |
+| `SELVE_SERVER_PASSWORD` | yes | Password of the Selve Home Server 2. |
+
+Shutters that report an invalid state at startup, such as devices that are still paired on the server but no longer reachable, are ignored and logged.
+
+### Persistent storage
+
+The bridge stores its Matter commissioning data in `/root/.matter`. Map this path to persistent storage. If you do not, the bridge loses its pairing when the container is recreated, and you must commission it again.
 
 A QR-Code and a code for pairing can be retrieved with:
 

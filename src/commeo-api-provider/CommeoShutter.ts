@@ -26,10 +26,14 @@ export class CommeoShutter {
         return await getDeviceConfiguration(this.adr);
     }
 
+    private logCommandError = (command: string) => (error: any) => {
+        console.error(`${command} failed for shutter ${this.sid}: ${error?.message ?? error}`);
+    }
+
     public updateName = async () => {
         return this.getConfig().then(async (result) => {
         const res = await result;
-        if(!res.info.configurable.name) {
+        if(!res?.info?.configurable?.name) {
             throw new Error("Name of device not found");
         }
 
@@ -42,7 +46,7 @@ export class CommeoShutter {
             throw new Error("SID of device undefined");
         }
 
-        moveUp(this.sid);
+        moveUp(this.sid).catch(this.logCommandError("moveUp"));
     }
 
     public moveDown = () => {
@@ -50,7 +54,7 @@ export class CommeoShutter {
             throw new Error("SID of device undefined");
         }
 
-        moveDown(this.sid);
+        moveDown(this.sid).catch(this.logCommandError("moveDown"));
     }
 
     public stop = () => {
@@ -58,7 +62,7 @@ export class CommeoShutter {
             throw new Error("SID of device undefined");
         }
 
-        stop(this.sid);
+        stop(this.sid).catch(this.logCommandError("stop"));
     }
 
     public moveTo = (targetPos: number) => {
@@ -66,6 +70,6 @@ export class CommeoShutter {
             throw new Error("SID of device undefined");
         }
 
-        moveTo(this.sid, targetPos);
+        moveTo(this.sid, targetPos).catch(this.logCommandError("moveTo"));
     }
 }

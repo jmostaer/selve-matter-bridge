@@ -1,7 +1,7 @@
 import { sendRequest } from "./commeo-api-provider.js";
 import { RequestMethod } from "./RequestMethod.js";
 
-export const moveTo = (id: string, pos: number) => {
+export const moveTo = async (id: string, pos: number) => {
 	if (pos > 100 || pos < 0) {
 		throw new Error("Invalid Position");
 	}
@@ -13,5 +13,5 @@ export const moveTo = (id: string, pos: number) => {
 			value: pos,
 		},
 	};
-	sendRequest(RequestMethod.POST, "/cmd", body);
+	return sendRequest(RequestMethod.POST, "/cmd", body);
 };

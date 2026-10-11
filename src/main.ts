@@ -7,7 +7,8 @@ import { CommeoShutter } from "./commeo-api-provider/CommeoShutter.js";
 import { getStates } from "./commeo-api-provider/get-states.js";
 import { AggregatorEndpoint } from "@matter/main/endpoints";
 
-let updateTimemout: NodeJS.Timeout;
+let updateTimemout: NodeJS.Timeout | undefined;
+let stopped = false;
 
 
 
@@ -68,18 +69,24 @@ const updateAllWindowCoverings = async () => {
 
     const CMdevices: any[] = states.filter((val: any) => {return val.type == "CM"});
 
-	CMdevices.map((cmDevice) => {
+	for (const cmDevice of CMdevices) {
 		const matterDevice = deviceMap.get(cmDevice.sid);
-		if(matterDevice) {
-			matterDevice.setStateOf(SelveWindowCovering, {
-				currentPositionLiftPercent100ths: cmDevice.state.position * 100
-			});
+		if(matterDevice && typeof cmDevice.state?.position === "number") {
+			try {
+				await matterDevice.setStateOf(SelveWindowCovering, {
+					currentPositionLiftPercent100ths: cmDevice.state.position * 100
+				});
+			} catch(error: any) {
+				console.error(`Couldn't update shutter ${cmDevice.sid}: ${error.message}`);
+			}
 		}
-	})
+	}
 } catch(error: any) {
 	console.error(`Couldn't reach the server: ${error.message}`)
 } finally {
-	updateTimemout = setTimeout(() => updateAllWindowCoverings(), 1000);
+	if (!stopped) {
+		updateTimemout = setTimeout(() => updateAllWindowCoverings(), 1000);
+	}
 }
 
 }
@@ -118,3 +125,6 @@ for (const shutter of commeoShutters) {
 updateAllWindowCoverings();
 
 await node.run();
+
+stopped = true;
+clearTimeout(updateTimemout);

@@ -9,5 +9,5 @@ export const moveDown = (id: string) => {
 			cmd: "moveDown",
 		},
 	};
-	sendRequest(RequestMethod.POST, "/cmd", body);
+	return sendRequest(RequestMethod.POST, "/cmd", body);
 };

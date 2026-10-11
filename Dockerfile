@@ -30,5 +30,8 @@ COPY --from=build /app .
 # Dies informiert Docker, dass der Container Port 3000 nutzt
 EXPOSE 3000
 
+# matter.js keeps its commissioning data in $HOME/.matter
+VOLUME /root/.matter
+
 # Startbefehl: Ersetzen Sie 'server.js' durch Ihre Startdatei
 CMD ["node", "./dist/main.js"]
